@@ -11,13 +11,17 @@ function saveByteArray(reportName, byte) {
   link.click();
 }
 
-const baseUrl = `${window.location.protocol}//${window.location.host}/assets/`;
+window.createPDF = async function () {
+  const existingPdfBytes = await fetch("./123.pdf").then((res) =>
+    res.arrayBuffer()
+  );
 
-window.createPDF = function () {
+  const baseUrl = `${window.location.protocol}//${window.location.host}/assets/`;
+
   PSPDFKit.load({
     baseUrl,
     container: "#pspdfkit",
-    document: "123.pdf",
+    document: existingPdfBytes,
   })
     .then(async (instance) => {
       const annotation = new TextAnnotation({
@@ -41,6 +45,7 @@ window.createPDF = function () {
       const documentBuffer = await instance.exportPDF();
 
       saveByteArray("test.pdf", documentBuffer);
+      URL.revokeObjectURL(documentBlobObjectUrl);
     })
     .catch((error) => {
       console.error(error.message);
